@@ -1,0 +1,10 @@
+timezone: Africa/Lagos
+version: v1.0.0.0.0
+cookie: uniportV1
+db: bolt.db
+os:
+path:
+address: :8888
+encryption_keys:
+  public: public.pem
+  private: private.pem

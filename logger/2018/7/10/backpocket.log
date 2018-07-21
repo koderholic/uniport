@@ -1,0 +1,2 @@
+2018/07/10 08:08:13.168763 cors.go:164: [cors] WARNING: unsafe configuration: AllowOrigin * and AllowCredientials true combined
+2018/07/10 08:08:13.182776 0router.go:162: serving @ :4444
