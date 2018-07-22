@@ -11,25 +11,33 @@ import (
 	"uniport/config"
 )
 
-//Wallets ...
-type Wallets struct {
-	ID       uint64
-	Workflow string
+//Type, Status, DocID,
+
+//Formms ...
+type Formms struct {
+	ID uint64
+	Title, Workflow,
+	Description string
 	Createdate,
 	Updatedate time.Time
-	Path uint32
 
-	Label, Mnemonic,
-	Description string
-	Password []byte
+	PackageQty, UomQty   float64
+	PackageType, UomType string
+
+	DocNo, Hscode,
+	Currency, PFIno, PFIdate,
+	Transport, CountryOrigin,
+	CountrySupply string
+
+	InvoiceID uint64
 }
 
-func (wallet Wallets) bucketName() string {
-	return "Wallets"
+func (Formm Formms) bucketName() string {
+	return "Formms"
 }
 
 //Create ...
-func (wallet Wallets) Create(bucketType *Wallets) (err error) {
+func (Formm Formms) Create(bucketType *Formms) (err error) {
 
 	if err = config.Get().BoltHold.Bolt().Update(func(tx *bolt.Tx) error {
 
@@ -39,7 +47,7 @@ func (wallet Wallets) Create(bucketType *Wallets) (err error) {
 		}
 
 		if bucketType.ID == 0 {
-			bucket := tx.Bucket([]byte(wallet.bucketName()))
+			bucket := tx.Bucket([]byte(Formm.bucketName()))
 			bucketType.ID, _ = bucket.NextSequence()
 			bucketType.Createdate = time.Now()
 		} else {
@@ -55,8 +63,8 @@ func (wallet Wallets) Create(bucketType *Wallets) (err error) {
 }
 
 //List ...
-func (wallet Wallets) List() (resultsALL []string) {
-	var results []Wallets
+func (Formm Formms) List() (resultsALL []string) {
+	var results []Formms
 
 	if err := config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {
 		err := config.Get().BoltHold.Find(&results, bolthold.Where("ID").Gt(uint64(0)))
@@ -72,7 +80,7 @@ func (wallet Wallets) List() (resultsALL []string) {
 }
 
 //GetFieldValue ...
-func (wallet Wallets) GetFieldValue(Field string, Value interface{}) (results []Wallets, err error) {
+func (Formm Formms) GetFieldValue(Field string, Value interface{}) (results []Formms, err error) {
 
 	if len(Field) > 0 {
 		if err = config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {

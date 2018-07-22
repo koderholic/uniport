@@ -11,8 +11,8 @@ import (
 	"uniport/config"
 )
 
-//Suppliers ...
-type Suppliers struct {
+//Agents ...
+type Agents struct {
 	ID, Createdby,
 	Updatedby uint64
 
@@ -26,12 +26,12 @@ type Suppliers struct {
 	Description string
 }
 
-func (supplier Suppliers) bucketName() string {
-	return "Suppliers"
+func (agent Agents) bucketName() string {
+	return "Agents"
 }
 
 //Create ...
-func (supplier Suppliers) Create(bucketType *Suppliers) (err error) {
+func (agent Agents) Create(bucketType *Agents) (err error) {
 
 	if err = config.Get().BoltHold.Bolt().Update(func(tx *bolt.Tx) error {
 
@@ -41,7 +41,7 @@ func (supplier Suppliers) Create(bucketType *Suppliers) (err error) {
 		}
 
 		if bucketType.ID == 0 {
-			bucket := tx.Bucket([]byte(supplier.bucketName()))
+			bucket := tx.Bucket([]byte(agent.bucketName()))
 			bucketType.ID, _ = bucket.NextSequence()
 			bucketType.Createdate = time.Now()
 			bucketType.Createdby = bucketType.Updatedby
@@ -59,8 +59,8 @@ func (supplier Suppliers) Create(bucketType *Suppliers) (err error) {
 }
 
 //List ...
-func (supplier Suppliers) List() (resultsALL []string) {
-	var results []Suppliers
+func (agent Agents) List() (resultsALL []string) {
+	var results []Agents
 
 	if err := config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {
 		err := config.Get().BoltHold.Find(&results, bolthold.Where("ID").Gt(uint64(0)))
@@ -76,7 +76,7 @@ func (supplier Suppliers) List() (resultsALL []string) {
 }
 
 //GetFieldValue ...
-func (supplier Suppliers) GetFieldValue(Field string, Value interface{}) (results []Suppliers, err error) {
+func (agent Agents) GetFieldValue(Field string, Value interface{}) (results []Agents, err error) {
 
 	if len(Field) > 0 {
 		if err = config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {

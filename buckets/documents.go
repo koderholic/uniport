@@ -3,7 +3,6 @@ package buckets
 import (
 	"fmt"
 	"log"
-	"math/big"
 	"time"
 
 	"github.com/coreos/bbolt"
@@ -12,28 +11,26 @@ import (
 	"uniport/config"
 )
 
-//Transactions ...
-type Transactions struct {
-	ID       uint64
-	Workflow string
-	Createdate,
-	Updatedate time.Time
+type Documents struct {
+	ID, Createdby, Updatedby uint64
+	Code, Title, Workflow,
+	Description string
+	Createdate, Updatedate time.Time
 
-	Block uint32
+	Doctype,
+	Filename, Filemeta,
+	Filetype, Filepath,
+	Ref, RefID string
 
-	Reference, FromAddress,
-	ToAddress string
-
-	Amount              *big.Int
-	WalletID, AccountID uint64
+	Position int
+	Filesize uint64
 }
 
-func (transaction Transactions) bucketName() string {
-	return "Transactions"
+func (this Documents) bucketName() string {
+	return "Documents"
 }
 
-//Create ...
-func (transaction Transactions) Create(bucketType *Transactions) (err error) {
+func (this Documents) Create(bucketType *Documents) (err error) {
 
 	if err = config.Get().BoltHold.Bolt().Update(func(tx *bolt.Tx) error {
 
@@ -43,9 +40,10 @@ func (transaction Transactions) Create(bucketType *Transactions) (err error) {
 		}
 
 		if bucketType.ID == 0 {
-			bucket := tx.Bucket([]byte(transaction.bucketName()))
+			bucket := tx.Bucket([]byte(this.bucketName()))
 			bucketType.ID, _ = bucket.NextSequence()
 			bucketType.Createdate = time.Now()
+			bucketType.Createdby = bucketType.Updatedby
 		} else {
 			bucketType.Updatedate = time.Now()
 		}
@@ -58,9 +56,8 @@ func (transaction Transactions) Create(bucketType *Transactions) (err error) {
 	return
 }
 
-//List ...
-func (transaction Transactions) List() (resultsALL []string) {
-	var results []Transactions
+func (this Documents) List() (resultsALL []string) {
+	var results []Documents
 
 	if err := config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {
 		err := config.Get().BoltHold.Find(&results, bolthold.Where("ID").Gt(uint64(0)))
@@ -75,8 +72,7 @@ func (transaction Transactions) List() (resultsALL []string) {
 	return
 }
 
-//GetFieldValue ...
-func (transaction Transactions) GetFieldValue(Field string, Value interface{}) (results []Transactions, err error) {
+func (this Documents) GetFieldValue(Field string, Value interface{}) (results []Documents, err error) {
 
 	if len(Field) > 0 {
 		if err = config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {

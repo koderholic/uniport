@@ -11,23 +11,26 @@ import (
 	"uniport/config"
 )
 
-//Recipients ...
-type Recipients struct {
-	ID       uint64
+type Invoicelines struct {
+	ID uint64
+	Title, Description,
 	Workflow string
 	Createdate,
 	Updatedate time.Time
 
-	Label, Email, Mobile,
-	Address string
+	Lineno, Pallets uint64
+	Quantity, Price,
+	Total float64
+
+	SalesOrder, DeliveryNote,
+	PurchaseOrder string
 }
 
-func (recipient Recipients) bucketName() string {
-	return "Recipients"
+func (this Invoicelines) bucketName() string {
+	return "Invoicelines"
 }
 
-//Create ...
-func (recipient Recipients) Create(bucketType *Recipients) (err error) {
+func (this Invoicelines) Create(bucketType *Invoicelines) (err error) {
 
 	if err = config.Get().BoltHold.Bolt().Update(func(tx *bolt.Tx) error {
 
@@ -37,7 +40,7 @@ func (recipient Recipients) Create(bucketType *Recipients) (err error) {
 		}
 
 		if bucketType.ID == 0 {
-			bucket := tx.Bucket([]byte(recipient.bucketName()))
+			bucket := tx.Bucket([]byte(this.bucketName()))
 			bucketType.ID, _ = bucket.NextSequence()
 			bucketType.Createdate = time.Now()
 		} else {
@@ -46,16 +49,14 @@ func (recipient Recipients) Create(bucketType *Recipients) (err error) {
 
 		err = config.Get().BoltHold.TxUpsert(tx, bucketType.ID, bucketType)
 		return err
-
 	}); err != nil {
 		log.Printf(err.Error())
 	}
 	return
 }
 
-//List ...
-func (recipient Recipients) List() (resultsALL []string) {
-	var results []Recipients
+func (this Invoicelines) List() (resultsALL []string) {
+	var results []Invoicelines
 
 	if err := config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {
 		err := config.Get().BoltHold.Find(&results, bolthold.Where("ID").Gt(uint64(0)))
@@ -63,15 +64,14 @@ func (recipient Recipients) List() (resultsALL []string) {
 	}); err != nil {
 		log.Printf(err.Error())
 	} else {
-		for _, row := range results {
-			resultsALL = append(resultsALL, fmt.Sprintf("%+v", row))
+		for _, record := range results {
+			resultsALL = append(resultsALL, fmt.Sprintf("%+v", record))
 		}
 	}
 	return
 }
 
-//GetFieldValue ...
-func (recipient Recipients) GetFieldValue(Field string, Value interface{}) (results []Recipients, err error) {
+func (this Invoicelines) GetFieldValue(Field string, Value interface{}) (results []Invoicelines, err error) {
 
 	if len(Field) > 0 {
 		if err = config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {

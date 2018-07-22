@@ -3,7 +3,6 @@ package buckets
 import (
 	"fmt"
 	"log"
-	"math/big"
 	"time"
 
 	"github.com/coreos/bbolt"
@@ -12,27 +11,47 @@ import (
 	"uniport/config"
 )
 
-//Accounts ...
-type Accounts struct {
-	ID       uint64
+//ProformaInvoice
+//AgentInvoice
+//CommercialInvoice
+
+//Invoices ...
+type Invoices struct {
+	ID uint64
+	Title, Description,
 	Workflow string
-	Createdate,
-	Updatedate time.Time
-	Path uint32
 
-	Label, Address, Publickey,
-	Privatekey string
+	Createdate, Updatedate,
+	ShipmentDate time.Time
 
-	Balance  *big.Int
-	WalletID uint64
+	AgentID, SupplierID uint64
+
+	Type, Agent, VatNo, Tin, OurRef,
+	YourRef, Date, Attention,
+	Supplier, Country, Products,
+	Quantity, DutyRate,
+	DisbursementRate,
+	MaintanceFeeRate,
+	Currency, VatRate,
+	DeliveryDate, DateDue,
+	Paymentterms, Shipmentterms,
+	BankOne, BankTwo, AccountOne,
+	AccountTwo, WayBillNo,
+	Origin string
+
+	ExWorks, FOBcharges,
+	Freight, CandF, SubTotal,
+	Disbursement, MaintanceFee,
+	TotalExclVat, Vat,
+	TotalInclVat, AmountDue float64
 }
 
-func (account Accounts) bucketName() string {
-	return "Accounts"
+func (invoice Invoices) bucketName() string {
+	return "Invoices"
 }
 
 //Create ...
-func (account Accounts) Create(bucketType *Accounts) (err error) {
+func (invoice Invoices) Create(bucketType *Invoices) (err error) {
 
 	if err = config.Get().BoltHold.Bolt().Update(func(tx *bolt.Tx) error {
 
@@ -42,7 +61,7 @@ func (account Accounts) Create(bucketType *Accounts) (err error) {
 		}
 
 		if bucketType.ID == 0 {
-			bucket := tx.Bucket([]byte(account.bucketName()))
+			bucket := tx.Bucket([]byte(invoice.bucketName()))
 			bucketType.ID, _ = bucket.NextSequence()
 			bucketType.Createdate = time.Now()
 		} else {
@@ -58,8 +77,8 @@ func (account Accounts) Create(bucketType *Accounts) (err error) {
 }
 
 //List ...
-func (account Accounts) List() (resultsALL []string) {
-	var results []Accounts
+func (invoice Invoices) List() (resultsALL []string) {
+	var results []Invoices
 
 	if err := config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {
 		err := config.Get().BoltHold.Find(&results, bolthold.Where("ID").Gt(uint64(0)))
@@ -75,7 +94,7 @@ func (account Accounts) List() (resultsALL []string) {
 }
 
 //GetFieldValue ...
-func (account Accounts) GetFieldValue(Field string, Value interface{}) (results []Accounts, err error) {
+func (invoice Invoices) GetFieldValue(Field string, Value interface{}) (results []Invoices, err error) {
 
 	if len(Field) > 0 {
 		if err = config.Get().BoltHold.Bolt().View(func(tx *bolt.Tx) error {
