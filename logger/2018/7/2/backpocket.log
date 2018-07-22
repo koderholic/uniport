@@ -1,0 +1,6 @@
+2018/07/02 18:33:06.688681 config.go:73: Error reading public key open /public.pem: no such file or directory
+2018/07/02 18:34:09.508051 #router.go:185: serving @ :4190
+2018/07/02 19:57:00.744666 #router.go:185: serving @ :4444
+2018/07/02 21:07:25.341275 #router.go:162: serving @ :4444
+2018/07/02 22:32:50.210277 #router.go:162: serving @ :4444
+2018/07/02 22:53:27.397555 #router.go:162: serving @ :4444
